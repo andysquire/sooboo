@@ -15,6 +15,11 @@ team cost track against a target in real time.
   the toolbar shows the total cost of the whole structure.
 - **Target cost & variance** — set a target headcount cost and see exactly how
   far the current structure is over or under, in £ and %.
+- **Custom labels** — create colour-coded labels (e.g. "Proposed", "At risk",
+  "Confirmed") from the **Labels** button in the toolbar, then assign one to
+  any role from the small chip on its card. The card's border and background
+  pick up the label's colour, so status is visible at a glance across the
+  whole chart.
 - **Save / Open** — structures save as `.json` files you can keep in version
   control, email, or store on SharePoint. `Cmd+S` / `Cmd+O` work as expected,
   and the app will prompt to save unsaved changes before closing.

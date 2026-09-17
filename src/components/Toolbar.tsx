@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import type { Label } from "../types";
+import LabelManager from "./LabelManager";
 
 const currency = new Intl.NumberFormat("en-GB", {
   style: "currency",
@@ -22,6 +24,14 @@ interface ToolbarProps {
   onSave: () => void;
   onSaveAs: () => void;
   onExportCsv: () => void;
+  labels: Label[];
+  showLabelManager: boolean;
+  onToggleLabelManager: () => void;
+  onCloseLabelManager: () => void;
+  onAddLabel: () => void;
+  onRenameLabel: (id: string, name: string) => void;
+  onRecolorLabel: (id: string, color: string) => void;
+  onDeleteLabel: (id: string) => void;
 }
 
 export default function Toolbar({
@@ -40,6 +50,14 @@ export default function Toolbar({
   onSave,
   onSaveAs,
   onExportCsv,
+  labels,
+  showLabelManager,
+  onToggleLabelManager,
+  onCloseLabelManager,
+  onAddLabel,
+  onRenameLabel,
+  onRecolorLabel,
+  onDeleteLabel,
 }: ToolbarProps) {
   const [nameDraft, setNameDraft] = useState(orgName);
   const [targetDraft, setTargetDraft] = useState(String(targetCost));
@@ -84,6 +102,19 @@ export default function Toolbar({
           <button type="button" onClick={onSave}>Save</button>
           <button type="button" onClick={onSaveAs}>Save As…</button>
           <button type="button" onClick={onExportCsv}>Export CSV</button>
+          <div className="label-manager-anchor">
+            <button type="button" onClick={onToggleLabelManager}>Labels</button>
+            {showLabelManager && (
+              <LabelManager
+                labels={labels}
+                onClose={onCloseLabelManager}
+                onAdd={onAddLabel}
+                onRename={onRenameLabel}
+                onRecolor={onRecolorLabel}
+                onDelete={onDeleteLabel}
+              />
+            )}
+          </div>
         </div>
       </div>
 

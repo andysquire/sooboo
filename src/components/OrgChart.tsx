@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { Position } from "../types";
+import type { Label, Position } from "../types";
 import PositionNode from "./PositionNode";
 
 interface OrgChartProps {
@@ -11,6 +11,9 @@ interface OrgChartProps {
   onDelete: (id: string) => void;
   onDeleteWithReports: (id: string) => void;
   onMove: (dragId: string, dropId: string) => void;
+  labels: Label[];
+  onAssignLabel: (id: string, labelId: string | null) => void;
+  onManageLabels: () => void;
 }
 
 export default function OrgChart({
@@ -22,6 +25,9 @@ export default function OrgChart({
   onDelete,
   onDeleteWithReports,
   onMove,
+  labels,
+  onAssignLabel,
+  onManageLabels,
 }: OrgChartProps) {
   const [dragOverId, setDragOverId] = useState<string | null>(null);
   const [draggingId, setDraggingId] = useState<string | null>(null);
@@ -39,6 +45,9 @@ export default function OrgChart({
             onDelete={onDelete}
             onDeleteWithReports={onDeleteWithReports}
             onMove={onMove}
+            labels={labels}
+            onAssignLabel={onAssignLabel}
+            onManageLabels={onManageLabels}
             dragOverId={dragOverId}
             draggingId={draggingId}
             setDragOverId={setDragOverId}

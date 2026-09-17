@@ -44,9 +44,19 @@ export function isDescendant(node: Position, ancestorId: string): boolean {
   return node.children.some((child) => isDescendant(child, ancestorId));
 }
 
-export function updatePosition(node: Position, id: string, patch: Partial<Pick<Position, "title" | "cost">>): Position {
+export function updatePosition(
+  node: Position,
+  id: string,
+  patch: Partial<Pick<Position, "title" | "cost" | "labelId">>
+): Position {
   if (node.id === id) return { ...node, ...patch };
   return { ...node, children: node.children.map((child) => updatePosition(child, id, patch)) };
+}
+
+/** Clears labelId wherever it references `labelId`, e.g. after that label is deleted. */
+export function unsetLabelEverywhere(node: Position, labelId: string): Position {
+  const cleared = node.labelId === labelId ? { ...node, labelId: null } : node;
+  return { ...cleared, children: node.children.map((child) => unsetLabelEverywhere(child, labelId)) };
 }
 
 export function addChild(node: Position, parentId: string, child: Position): Position {
@@ -115,10 +125,16 @@ export function moveNode(root: Position, dragId: string, dropId: string): Positi
   return addChild(tree, dropId, removed);
 }
 
-export function toCsvRows(node: Position, depth = 0, parentTitle = ""): string[][] {
-  const rows: string[][] = [[String(depth), node.title, parentTitle, node.cost.toFixed(2)]];
+export function toCsvRows(
+  node: Position,
+  labelNamesById: Map<string, string>,
+  depth = 0,
+  parentTitle = ""
+): string[][] {
+  const labelName = node.labelId ? (labelNamesById.get(node.labelId) ?? "") : "";
+  const rows: string[][] = [[String(depth), node.title, parentTitle, node.cost.toFixed(2), labelName]];
   for (const child of node.children) {
-    rows.push(...toCsvRows(child, depth + 1, node.title));
+    rows.push(...toCsvRows(child, labelNamesById, depth + 1, node.title));
   }
   return rows;
 }

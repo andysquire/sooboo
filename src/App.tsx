@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { ChartDocument, Position } from "./types";
+import type { ChartDocument, Label, Position } from "./types";
 import {
   addChild,
   createDefaultChart,
@@ -10,16 +10,20 @@ import {
   moveNode,
   toCsvRows,
   totalCost,
+  unsetLabelEverywhere,
+  updatePosition,
 } from "./tree";
+import { createLabel, LABEL_PALETTE } from "./labels";
 import Toolbar from "./components/Toolbar";
 import OrgChart from "./components/OrgChart";
 import "./App.css";
 
 const DOCUMENT_VERSION = 1 as const;
 
-function toCsv(root: Position): string {
-  const header = ["Level", "Role", "Reports To", "Annual Cost (GBP)"];
-  const rows = toCsvRows(root);
+function toCsv(root: Position, labels: Label[]): string {
+  const header = ["Level", "Role", "Reports To", "Annual Cost (GBP)", "Label"];
+  const labelNamesById = new Map(labels.map((l) => [l.id, l.name]));
+  const rows = toCsvRows(root, labelNamesById);
   const escape = (value: string) => (/[",\n]/.test(value) ? `"${value.replace(/"/g, '""')}"` : value);
   return [header, ...rows].map((row) => row.map(escape).join(",")).join("\n");
 }
@@ -28,6 +32,8 @@ export default function App() {
   const [orgName, setOrgName] = useState("SUBU Team Structure");
   const [root, setRoot] = useState<Position>(() => createDefaultChart());
   const [targetCost, setTargetCost] = useState<number>(280000);
+  const [labels, setLabels] = useState<Label[]>([]);
+  const [showLabelManager, setShowLabelManager] = useState(false);
   const [filePath, setFilePath] = useState<string | null>(null);
   const [isDirty, setIsDirty] = useState(false);
   const [zoom, setZoom] = useState(1);
@@ -35,8 +41,8 @@ export default function App() {
 
   // Keep the latest state in refs so IPC callbacks (registered once) always
   // see current values without re-subscribing on every change.
-  const stateRef = useRef({ orgName, root, targetCost, filePath, isDirty });
-  stateRef.current = { orgName, root, targetCost, filePath, isDirty };
+  const stateRef = useRef({ orgName, root, targetCost, labels, filePath, isDirty });
+  stateRef.current = { orgName, root, targetCost, labels, filePath, isDirty };
 
   const markDirty = useCallback(() => setIsDirty(true), []);
 
@@ -52,13 +58,14 @@ export default function App() {
 
   const currentDocument = useCallback((): ChartDocument => {
     const s = stateRef.current;
-    return { version: DOCUMENT_VERSION, orgName: s.orgName, targetCost: s.targetCost, root: s.root };
+    return { version: DOCUMENT_VERSION, orgName: s.orgName, targetCost: s.targetCost, labels: s.labels, root: s.root };
   }, []);
 
   const applyOpenedDocument = useCallback((data: ChartDocument, path: string | null) => {
     setOrgName(data.orgName ?? "Untitled Team Structure");
     setRoot(data.root);
     setTargetCost(data.targetCost ?? 0);
+    setLabels(data.labels ?? []);
     setFilePath(path);
     setIsDirty(false);
   }, []);
@@ -73,6 +80,7 @@ export default function App() {
     setOrgName("New Team Structure");
     setRoot(createPosition("New Role", 0));
     setTargetCost(0);
+    setLabels([]);
     setFilePath(null);
     setIsDirty(false);
     setStatusMessage("Started a new chart");
@@ -110,7 +118,7 @@ export default function App() {
 
   const handleExportCsv = useCallback(async () => {
     if (!window.api) return;
-    const csv = toCsv(stateRef.current.root);
+    const csv = toCsv(stateRef.current.root, stateRef.current.labels);
     const suggested = `${stateRef.current.orgName || "SUBU Org Chart"}.csv`;
     const result = await window.api.exportCsv(csv, suggested);
     if (!result.canceled && result.filePath) setStatusMessage(`Exported ${result.filePath}`);
@@ -152,7 +160,7 @@ export default function App() {
 
   const handleRename = useCallback(
     (id: string, title: string) => {
-      setRoot((prev) => updateTitle(prev, id, title));
+      setRoot((prev) => updatePosition(prev, id, { title }));
       markDirty();
     },
     [markDirty]
@@ -160,7 +168,15 @@ export default function App() {
 
   const handleCostChange = useCallback(
     (id: string, cost: number) => {
-      setRoot((prev) => updateCost(prev, id, cost));
+      setRoot((prev) => updatePosition(prev, id, { cost }));
+      markDirty();
+    },
+    [markDirty]
+  );
+
+  const handleAssignLabel = useCallback(
+    (id: string, labelId: string | null) => {
+      setRoot((prev) => updatePosition(prev, id, { labelId }));
       markDirty();
     },
     [markDirty]
@@ -236,6 +252,36 @@ export default function App() {
     [markDirty]
   );
 
+  const handleAddLabel = useCallback(() => {
+    setLabels((prev) => [...prev, createLabel("New label", prev.length % LABEL_PALETTE.length)]);
+    markDirty();
+  }, [markDirty]);
+
+  const handleRenameLabel = useCallback(
+    (id: string, name: string) => {
+      setLabels((prev) => prev.map((l) => (l.id === id ? { ...l, name } : l)));
+      markDirty();
+    },
+    [markDirty]
+  );
+
+  const handleRecolorLabel = useCallback(
+    (id: string, color: string) => {
+      setLabels((prev) => prev.map((l) => (l.id === id ? { ...l, color } : l)));
+      markDirty();
+    },
+    [markDirty]
+  );
+
+  const handleDeleteLabel = useCallback(
+    (id: string) => {
+      setLabels((prev) => prev.filter((l) => l.id !== id));
+      setRoot((prev) => unsetLabelEverywhere(prev, id));
+      markDirty();
+    },
+    [markDirty]
+  );
+
   const total = totalCost(root);
 
   return (
@@ -256,6 +302,14 @@ export default function App() {
         onSave={handleSave}
         onSaveAs={handleSaveAs}
         onExportCsv={handleExportCsv}
+        labels={labels}
+        showLabelManager={showLabelManager}
+        onToggleLabelManager={() => setShowLabelManager((v) => !v)}
+        onCloseLabelManager={() => setShowLabelManager(false)}
+        onAddLabel={handleAddLabel}
+        onRenameLabel={handleRenameLabel}
+        onRecolorLabel={handleRecolorLabel}
+        onDeleteLabel={handleDeleteLabel}
       />
       <OrgChart
         root={root}
@@ -266,19 +320,12 @@ export default function App() {
         onDelete={handleDelete}
         onDeleteWithReports={handleDeleteWithReports}
         onMove={handleMove}
+        labels={labels}
+        onAssignLabel={handleAssignLabel}
+        onManageLabels={() => setShowLabelManager(true)}
       />
     </div>
   );
-}
-
-function updateTitle(node: Position, id: string, title: string): Position {
-  if (node.id === id) return { ...node, title };
-  return { ...node, children: node.children.map((c) => updateTitle(c, id, title)) };
-}
-
-function updateCost(node: Position, id: string, cost: number): Position {
-  if (node.id === id) return { ...node, cost };
-  return { ...node, children: node.children.map((c) => updateCost(c, id, cost)) };
 }
 
 function countAll(node: Position): number {

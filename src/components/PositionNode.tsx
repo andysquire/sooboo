@@ -1,6 +1,7 @@
-import { useEffect, useRef, useState } from "react";
-import type { Position } from "../types";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
+import type { Label, Position } from "../types";
 import { totalCost } from "../tree";
+import LabelPicker from "./LabelPicker";
 
 const currency = new Intl.NumberFormat("en-GB", {
   style: "currency",
@@ -17,6 +18,9 @@ interface PositionNodeProps {
   onDelete: (id: string) => void;
   onDeleteWithReports: (id: string) => void;
   onMove: (dragId: string, dropId: string) => void;
+  labels: Label[];
+  onAssignLabel: (id: string, labelId: string | null) => void;
+  onManageLabels: () => void;
   dragOverId: string | null;
   draggingId: string | null;
   setDragOverId: (id: string | null) => void;
@@ -32,6 +36,9 @@ export default function PositionNode({
   onDelete,
   onDeleteWithReports,
   onMove,
+  labels,
+  onAssignLabel,
+  onManageLabels,
   dragOverId,
   draggingId,
   setDragOverId,
@@ -48,6 +55,7 @@ export default function PositionNode({
   const hasChildren = node.children.length > 0;
   const isDropTarget = dragOverId === node.id && draggingId !== node.id;
   const isBeingDragged = draggingId === node.id;
+  const activeLabel = labels.find((l) => l.id === node.labelId) ?? null;
 
   const commitTitle = () => {
     const trimmed = titleDraft.trim();
@@ -62,7 +70,8 @@ export default function PositionNode({
   return (
     <li>
       <div
-        className={`position-card${isDropTarget ? " drop-target" : ""}${isBeingDragged ? " dragging" : ""}${isRoot ? " root" : ""}`}
+        className={`position-card${isDropTarget ? " drop-target" : ""}${isBeingDragged ? " dragging" : ""}${isRoot ? " root" : ""}${activeLabel ? " has-label" : ""}`}
+        style={activeLabel ? ({ "--label-color": activeLabel.color } as CSSProperties) : undefined}
         draggable={!isRoot}
         onDragStart={(e) => {
           if (isRoot) return;
@@ -102,6 +111,12 @@ export default function PositionNode({
             if (e.key === "Enter") titleRef.current?.blur();
           }}
           aria-label="Role title"
+        />
+        <LabelPicker
+          labels={labels}
+          currentLabelId={node.labelId}
+          onAssign={(labelId) => onAssignLabel(node.id, labelId)}
+          onManageLabels={onManageLabels}
         />
         <label className="position-cost">
           <span className="currency-symbol">£</span>
@@ -165,6 +180,9 @@ export default function PositionNode({
               onDelete={onDelete}
               onDeleteWithReports={onDeleteWithReports}
               onMove={onMove}
+              labels={labels}
+              onAssignLabel={onAssignLabel}
+              onManageLabels={onManageLabels}
               dragOverId={dragOverId}
               draggingId={draggingId}
               setDragOverId={setDragOverId}

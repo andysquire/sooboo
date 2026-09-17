@@ -2,13 +2,21 @@ export interface Position {
   id: string;
   title: string;
   cost: number;
+  labelId?: string | null;
   children: Position[];
+}
+
+export interface Label {
+  id: string;
+  name: string;
+  color: string;
 }
 
 export interface ChartDocument {
   version: 1;
   orgName: string;
   targetCost: number;
+  labels: Label[];
   root: Position;
 }
 
