@@ -1,0 +1,472 @@
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+}
+
+/* ---------- Toolbar ---------- */
+
+.toolbar {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 30px 20px 12px;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(60, 30, 90, 0.12);
+  -webkit-app-region: drag;
+  flex-shrink: 0;
+}
+
+.toolbar .no-drag,
+.toolbar input,
+.toolbar button {
+  -webkit-app-region: no-drag;
+}
+
+.toolbar-row {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.toolbar-row-drag {
+  justify-content: space-between;
+}
+
+.toolbar-titles {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.org-name-input {
+  font-size: 19px;
+  font-weight: 700;
+  border: none;
+  background: transparent;
+  color: #241b3d;
+  padding: 2px 4px;
+  border-radius: 6px;
+  max-width: 420px;
+}
+
+.org-name-input:hover,
+.org-name-input:focus {
+  background: rgba(107, 47, 178, 0.08);
+  outline: none;
+}
+
+.file-status {
+  font-size: 12px;
+  color: #6b6480;
+  padding-left: 6px;
+}
+
+.toolbar-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.toolbar-actions button,
+.zoom-controls button {
+  border: 1px solid rgba(60, 30, 90, 0.16);
+  background: #ffffff;
+  color: #3c2560;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.05s ease;
+}
+
+.toolbar-actions button:hover,
+.zoom-controls button:hover {
+  background: #f1ebfb;
+}
+
+.toolbar-actions button:active,
+.zoom-controls button:active {
+  transform: scale(0.97);
+}
+
+.metric {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 14px;
+  border-radius: 10px;
+  background: #ffffff;
+  border: 1px solid rgba(60, 30, 90, 0.1);
+  min-width: 150px;
+}
+
+.metric-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #837c98;
+  font-weight: 600;
+}
+
+.metric-value {
+  font-size: 18px;
+  font-weight: 700;
+  color: #241b3d;
+}
+
+.target-input-field {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.target-input-field input {
+  border: none;
+  font-size: 18px;
+  font-weight: 700;
+  color: #241b3d;
+  width: 100%;
+  background: transparent;
+}
+
+.target-input-field input:focus {
+  outline: none;
+}
+
+.currency-symbol {
+  color: #837c98;
+  font-weight: 700;
+}
+
+.metric.variance.on-target {
+  background: #eef8f1;
+  border-color: #b7e3c4;
+}
+.metric.variance.on-target .metric-value {
+  color: #1d7a44;
+}
+
+.metric.variance.under-target {
+  background: #eaf6ee;
+  border-color: #b7e3c4;
+}
+.metric.variance.under-target .metric-value {
+  color: #1d7a44;
+}
+
+.metric.variance.over-target {
+  background: #fdecec;
+  border-color: #f3b9b9;
+}
+.metric.variance.over-target .metric-value {
+  color: #b3261e;
+}
+
+.zoom-controls {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+}
+
+.zoom-controls button {
+  padding: 6px 10px;
+}
+
+.zoom-value {
+  font-size: 12px;
+  color: #6b6480;
+  min-width: 38px;
+  text-align: center;
+}
+
+/* ---------- Chart canvas ---------- */
+
+.chart-canvas {
+  flex: 1;
+  overflow: auto;
+  padding: 48px 60px 80px;
+  display: flex;
+  justify-content: center;
+}
+
+.chart-zoom {
+  transform-origin: top center;
+  transition: transform 0.12s ease-out;
+  height: fit-content;
+}
+
+/* Classic CSS org-chart tree, adapted for React-rendered nested lists. */
+ul.org-tree,
+ul.org-tree ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+}
+
+ul.org-tree {
+  padding-top: 0;
+}
+
+ul.org-tree ul {
+  padding-top: 40px;
+  position: relative;
+}
+
+.org-tree li {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  padding: 0 18px;
+}
+
+/* Vertical connector down from a parent card to its children row */
+.org-tree li ul::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 1px;
+  height: 40px;
+  background: #c7bde0;
+}
+
+/* Horizontal connector across siblings */
+.org-tree li ul li {
+  position: relative;
+}
+
+.org-tree li ul li::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 50%;
+  height: 40px;
+  border-top: 1px solid #c7bde0;
+}
+
+.org-tree li ul li::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 50%;
+  height: 40px;
+  border-top: 1px solid #c7bde0;
+}
+
+.org-tree li ul li:first-child::before {
+  border-top: none;
+}
+.org-tree li ul li:last-child::after {
+  border-top: none;
+}
+
+/* Vertical stub connecting each child card up to the horizontal bar */
+.org-tree li ul li > .position-card {
+  position: relative;
+}
+
+.org-tree li ul li > .position-card::before {
+  content: "";
+  position: absolute;
+  top: -40px;
+  left: 50%;
+  width: 1px;
+  height: 40px;
+  background: #c7bde0;
+}
+
+/* ---------- Position card ---------- */
+
+.position-card {
+  width: 220px;
+  background: #ffffff;
+  border: 1px solid rgba(60, 30, 90, 0.12);
+  border-radius: 12px;
+  padding: 14px 14px 10px;
+  box-shadow: 0 1px 2px rgba(30, 15, 60, 0.06), 0 6px 16px rgba(30, 15, 60, 0.04);
+  cursor: grab;
+  transition: box-shadow 0.15s ease, border-color 0.15s ease, opacity 0.15s ease;
+}
+
+.position-card.root {
+  border-color: #6b2fb2;
+  box-shadow: 0 2px 4px rgba(107, 47, 178, 0.15), 0 10px 24px rgba(107, 47, 178, 0.12);
+  cursor: default;
+}
+
+.position-card.dragging {
+  opacity: 0.4;
+}
+
+.position-card.drop-target {
+  border-color: #6b2fb2;
+  box-shadow: 0 0 0 3px rgba(107, 47, 178, 0.25);
+}
+
+.position-title {
+  width: 100%;
+  border: none;
+  background: transparent;
+  font-size: 14px;
+  font-weight: 700;
+  color: #241b3d;
+  padding: 2px 4px;
+  border-radius: 6px;
+  margin-bottom: 4px;
+}
+
+.position-title:hover,
+.position-title:focus {
+  background: rgba(107, 47, 178, 0.08);
+  outline: none;
+}
+
+.position-cost {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 2px 4px;
+  border-radius: 6px;
+}
+
+.position-cost:hover {
+  background: rgba(107, 47, 178, 0.06);
+}
+
+.position-cost input {
+  border: none;
+  background: transparent;
+  font-size: 13px;
+  color: #4a3f66;
+  width: 100%;
+  -moz-appearance: textfield;
+}
+
+.position-cost input:focus {
+  outline: none;
+}
+
+.position-subtotal {
+  font-size: 11px;
+  color: #837c98;
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px dashed rgba(60, 30, 90, 0.12);
+}
+
+.position-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 8px;
+}
+
+.icon-btn {
+  font-size: 11px;
+  border: none;
+  background: #f1ebfb;
+  color: #4a2f7a;
+  padding: 4px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.icon-btn:hover {
+  background: #e4d8f7;
+}
+
+.icon-btn.danger {
+  background: #fdecec;
+  color: #b3261e;
+}
+
+.icon-btn.danger:hover {
+  background: #f9d3d3;
+}
+
+@media (prefers-color-scheme: dark) {
+  body {
+    background: #171223;
+    color: #efeaf9;
+  }
+
+  .toolbar {
+    background: rgba(24, 18, 38, 0.85);
+    border-bottom-color: rgba(200, 180, 240, 0.12);
+  }
+
+  .org-name-input,
+  .metric-value,
+  .position-title,
+  .file-status {
+    color: #efeaf9;
+  }
+
+  .toolbar-actions button,
+  .zoom-controls button,
+  .metric {
+    background: #241c38;
+    border-color: rgba(200, 180, 240, 0.14);
+    color: #efeaf9;
+  }
+
+  .toolbar-actions button:hover,
+  .zoom-controls button:hover {
+    background: #302650;
+  }
+
+  .position-card {
+    background: #241c38;
+    border-color: rgba(200, 180, 240, 0.14);
+  }
+
+  .position-cost input {
+    color: #cabfe6;
+  }
+
+  .icon-btn {
+    background: #302650;
+    color: #d9c9ff;
+  }
+
+  .icon-btn.danger {
+    background: #3a2130;
+    color: #ff9b9b;
+  }
+
+  .metric.variance.on-target,
+  .metric.variance.under-target {
+    background: #17301f;
+    border-color: #2c5c3c;
+  }
+  .metric.variance.on-target .metric-value,
+  .metric.variance.under-target .metric-value {
+    color: #7fe0a0;
+  }
+
+  .metric.variance.over-target {
+    background: #341a1a;
+    border-color: #6b2c2c;
+  }
+  .metric.variance.over-target .metric-value {
+    color: #ff9b9b;
+  }
+
+  .org-tree li ul::before,
+  .org-tree li ul li::before,
+  .org-tree li ul li::after,
+  .org-tree li ul li > .position-card::before {
+    background: #4a3f66;
+    border-color: #4a3f66;
+  }
+}

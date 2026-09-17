@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#8a4fd6"/>
+      <stop offset="100%" stop-color="#5a1fa0"/>
+    </linearGradient>
+  </defs>
+  <rect x="0" y="0" width="1024" height="1024" rx="224" fill="url(#bg)"/>
+
+  <!-- connectors -->
+  <g stroke="#e6d9ff" stroke-width="14" fill="none" opacity="0.9">
+    <line x1="512" y1="330" x2="512" y2="400"/>
+    <line x1="512" y1="400" x2="300" y2="400"/>
+    <line x1="512" y1="400" x2="512" y2="400"/>
+    <line x1="512" y1="400" x2="724" y2="400"/>
+    <line x1="300" y1="400" x2="300" y2="460"/>
+    <line x1="512" y1="400" x2="512" y2="460"/>
+    <line x1="724" y1="400" x2="724" y2="460"/>
+  </g>
+
+  <!-- top node -->
+  <rect x="392" y="230" width="240" height="100" rx="24" fill="#ffffff"/>
+  <rect x="424" y="264" width="176" height="16" rx="8" fill="#8a4fd6"/>
+  <rect x="424" y="292" width="110" height="12" rx="6" fill="#c9b3ec"/>
+
+  <!-- three child nodes -->
+  <g>
+    <rect x="196" y="460" width="208" height="88" rx="20" fill="#ffffff"/>
+    <rect x="222" y="490" width="140" height="14" rx="7" fill="#8a4fd6"/>
+    <rect x="222" y="514" width="90" height="10" rx="5" fill="#c9b3ec"/>
+  </g>
+  <g>
+    <rect x="408" y="460" width="208" height="88" rx="20" fill="#ffffff"/>
+    <rect x="434" y="490" width="140" height="14" rx="7" fill="#8a4fd6"/>
+    <rect x="434" y="514" width="90" height="10" rx="5" fill="#c9b3ec"/>
+  </g>
+  <g>
+    <rect x="620" y="460" width="208" height="88" rx="20" fill="#ffffff"/>
+    <rect x="646" y="490" width="140" height="14" rx="7" fill="#8a4fd6"/>
+    <rect x="646" y="514" width="90" height="10" rx="5" fill="#c9b3ec"/>
+  </g>
+
+  <!-- pound sign badge -->
+  <circle cx="512" cy="700" r="130" fill="#ffffff" opacity="0.95"/>
+  <text x="512" y="750" font-family="-apple-system, Helvetica, Arial, sans-serif" font-size="180" font-weight="700" fill="#5a1fa0" text-anchor="middle">£</text>
+</svg>
