@@ -17,8 +17,6 @@ interface ToolbarProps {
   filePath: string | null;
   isDirty: boolean;
   statusMessage: string | null;
-  zoom: number;
-  onZoomChange: (zoom: number) => void;
   onNew: () => void;
   onOpen: () => void;
   onSave: () => void;
@@ -43,8 +41,6 @@ export default function Toolbar({
   filePath,
   isDirty,
   statusMessage,
-  zoom,
-  onZoomChange,
   onNew,
   onOpen,
   onSave,
@@ -150,13 +146,6 @@ export default function Toolbar({
             {varianceLabel}
             {targetCost > 0 && ` (${variance >= 0 ? "+" : ""}${variancePct.toFixed(1)}%)`}
           </span>
-        </div>
-
-        <div className="zoom-controls">
-          <button type="button" onClick={() => onZoomChange(Math.max(0.5, +(zoom - 0.1).toFixed(2)))} title="Zoom out">−</button>
-          <span className="zoom-value">{Math.round(zoom * 100)}%</span>
-          <button type="button" onClick={() => onZoomChange(Math.min(1.5, +(zoom + 0.1).toFixed(2)))} title="Zoom in">+</button>
-          <button type="button" onClick={() => onZoomChange(1)} title="Reset zoom">Reset</button>
         </div>
       </div>
     </div>

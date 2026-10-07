@@ -23,6 +23,11 @@ team cost track against a target in real time.
 - **Save / Open** — structures save as `.json` files you can keep in version
   control, email, or store on SharePoint. `Cmd+S` / `Cmd+O` work as expected,
   and the app will prompt to save unsaved changes before closing.
+- **Zoom & Fit** — zoom controls float over the bottom-right of the chart.
+  **Fit** scales the whole structure to fit the window in one click, however
+  wide or deep it gets; the full tree is always reachable by scrolling, at
+  any zoom level. Long role names wrap onto multiple lines instead of being
+  clipped, so they stay readable even when zoomed out.
 - **Export CSV** — export a flat list of every role, its manager, and its cost
   for use in Excel or Google Sheets.
 

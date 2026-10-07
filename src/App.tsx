@@ -295,8 +295,6 @@ export default function App() {
         filePath={filePath}
         isDirty={isDirty}
         statusMessage={statusMessage}
-        zoom={zoom}
-        onZoomChange={setZoom}
         onNew={handleNewChart}
         onOpen={handleOpen}
         onSave={handleSave}
@@ -314,6 +312,7 @@ export default function App() {
       <OrgChart
         root={root}
         zoom={zoom}
+        onZoomChange={setZoom}
         onRename={handleRename}
         onCostChange={handleCostChange}
         onAddChild={handleAddChild}

@@ -46,10 +46,18 @@ export default function PositionNode({
 }: PositionNodeProps) {
   const [titleDraft, setTitleDraft] = useState(node.title);
   const [costDraft, setCostDraft] = useState(String(node.cost));
-  const titleRef = useRef<HTMLInputElement>(null);
+  const titleRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => setTitleDraft(node.title), [node.title]);
   useEffect(() => setCostDraft(String(node.cost)), [node.cost]);
+
+  // Auto-grow the title field to fit wrapped text instead of clipping it.
+  useEffect(() => {
+    const el = titleRef.current;
+    if (!el) return;
+    el.style.height = "auto";
+    el.style.height = `${el.scrollHeight}px`;
+  }, [titleDraft]);
 
   const subtotal = totalCost(node);
   const hasChildren = node.children.length > 0;
@@ -101,14 +109,18 @@ export default function PositionNode({
         }}
         title={!isRoot ? "Drag onto another role to move this position in the structure" : undefined}
       >
-        <input
+        <textarea
           ref={titleRef}
           className="position-title"
+          rows={1}
           value={titleDraft}
           onChange={(e) => setTitleDraft(e.target.value)}
           onBlur={commitTitle}
           onKeyDown={(e) => {
-            if (e.key === "Enter") titleRef.current?.blur();
+            if (e.key === "Enter" && !e.shiftKey) {
+              e.preventDefault();
+              titleRef.current?.blur();
+            }
           }}
           aria-label="Role title"
         />
